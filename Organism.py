@@ -91,13 +91,3 @@ class Organism:
 				neighbors.append((row+1, col+1))
 
 		return neighbors
-
-
-
-
-org = Organism(10, 10)
-print(org.MomentOfInertia())
-org.ShowBody()
-print()
-org.ConnectedComponents()
-org.ShowBody()
