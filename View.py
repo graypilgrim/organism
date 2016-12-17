@@ -1,48 +1,47 @@
 import sys
 from PyQt4 import QtGui, QtCore
 
+WIDTH = 800
+HEIGHT = 600
+
 class View(QtGui.QWidget):
 
-    def __init__(self):
-        super(View, self).__init__()
+	def __init__(self, organism):
+		super(View, self).__init__()
+		self.organism = organism
+		self.initUI()
 
-        self.initUI()
+	def initUI(self):
+		self.setGeometry(200, 200, WIDTH, HEIGHT)
+		self.setWindowTitle('Organism')
+		self.show()
 
-    def initUI(self, width, height):
+	def paintEvent(self, e):
+		qp = QtGui.QPainter()
+		qp.begin(self)
+		self.drawMatrix(qp)
+		qp.end()
 
-        self.setGeometry(200, 200, width, height)
-        self.setWindowTitle('Organism')
-        self.show()
+	def drawMatrix(self, qp):
+		colorsNo = self.organism.GetColorsNo()
 
-    def paintEvent(self, e):
+		color = QtGui.QColor(0, 0, 0)
+		qp.setPen(color)
 
-        qp = QtGui.QPainter()
-        qp.begin(self)
-        self.drawRectangles(qp)
-        qp.end()
+		qp.setBrush(QtGui.QColor(200, 0, 0))
+		qp.drawRect(10, 15, 90, 60)
 
-    def drawRectangles(self, qp):
+		qp.setBrush(QtGui.QColor(255, 80, 0, 160))
+		qp.drawRect(100, 15, 90, 60)
 
-        color = QtGui.QColor(0, 0, 0)
-        color.setNamedColor('#010101')
-        qp.setPen(color)
+		qp.setBrush(QtGui.QColor(25, 0, 90, 200))
+		qp.drawRect(190, 15, 90, 60)
 
-        qp.setBrush(QtGui.QColor(200, 0, 0))
-        qp.drawRect(10, 15, 90, 60)
-
-        qp.setBrush(QtGui.QColor(255, 80, 0, 160))
-        qp.drawRect(100, 15, 90, 60)
-
-        qp.setBrush(QtGui.QColor(25, 0, 90, 200))
-        qp.drawRect(190, 15, 90, 60)
-
-
-def main():
-
-    app = QtGui.QApplication(sys.argv)
-    ex = View()
-    sys.exit(app.exec_())
+	def drawRect(self, color)
 
 
 if __name__ == '__main__':
-    main()
+	app = QtGui.QApplication(sys.argv)
+	o = Organism(1, 1)
+	ex = View()
+	sys.exit(app.exec_())
