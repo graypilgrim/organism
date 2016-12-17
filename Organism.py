@@ -6,6 +6,7 @@ class Organism:
 		self.width = width
 		self.height = height
 		self.body = [[random.randint(0, 1) for x in range(width)] for y in range(height)]
+		self.color = 1
 
 	def ShowBody(self):
 		for x in range(self.height):
@@ -24,18 +25,16 @@ class Organism:
 		return result
 
 	def ConnectedComponents(self):
-		color = 1
-
 		for row in range(self.width):
 			for col in range(self.height):
 				if self.body[col][row] == 0:
 					continue
 
 				if self.body[col][row] == 1:
-					color += 1
-					self.ColorConnectedComponents(row, col, color)
+					self.color += 1
+					self.ColorConnectedComponents(row, col, self.color)
 
-		return color
+		return self.color
 
 	def Distanse(self, row, col):
 		widthCenter = self.width / 2
