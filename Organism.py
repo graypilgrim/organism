@@ -25,6 +25,7 @@ class Organism:
 
 		for i in range(self.bodySize):
 			for k in range(self.bodySize):
+
 				result += self.body[i][k] * self.Distanse(k, i)
 
 		return result
@@ -33,6 +34,7 @@ class Organism:
 		color = 1
 		for row in range(self.bodySize):
 			for col in range(self.bodySize):
+
 				if self.body[col][row] == 0:
 					continue
 
