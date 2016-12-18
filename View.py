@@ -1,5 +1,6 @@
 import sys
 from PyQt4 import QtGui, QtCore
+import random
 
 WIDTH = 800
 HEIGHT = 600
@@ -23,22 +24,35 @@ class View(QtGui.QWidget):
 		qp.end()
 
 	def drawMatrix(self, qp):
-		colorsNo = self.organism.GetColorsNo()
+		rgbColors = self.chooseColors()
+
+		horizBoxSide = WIDTH // self.organism.bodySize
+		vertBoxSide = HEIGHT // self.organism.bodySize
+
+		boxSide = min(horizBoxSide, vertBoxSide)
 
 		color = QtGui.QColor(0, 0, 0)
 		qp.setPen(color)
 
-		qp.setBrush(QtGui.QColor(200, 0, 0))
-		qp.drawRect(10, 15, 90, 60)
+		for col in range(self.organism.bodySize):
+			for row in range(self.organism.bodySize):
+				color = rgbColors[self.organism.body[col][row]]
+				qp.setBrush(QtGui.QColor(color[0], color[1], color[2]))
+				qp.drawRect(row*boxSide, col*boxSide, boxSide, boxSide)
 
-		qp.setBrush(QtGui.QColor(255, 80, 0, 160))
-		qp.drawRect(100, 15, 90, 60)
+	def chooseColors(self):
+		rgbColors = []
+		colorsNo = self.organism.GetConnectedComponentsNo()
 
-		qp.setBrush(QtGui.QColor(25, 0, 90, 200))
-		qp.drawRect(190, 15, 90, 60)
+		rgbColors.append((255, 255, 255))
 
-	def drawRect(self, color)
+		for i in range(1, colorsNo + 1):
+			r = random.randint(0, 255)
+			g = random.randint(0, 255)
+			b = random.randint(0, 255)
+			rgbColors.append((r, g, b))
 
+		return rgbColors
 
 if __name__ == '__main__':
 	app = QtGui.QApplication(sys.argv)
