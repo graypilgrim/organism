@@ -4,7 +4,7 @@ from View import View
 import sys
 from PyQt4 import QtGui, QtCore
 
-if len(sys.argv) < 2:
+if len(sys.argv) < 3:
 	print("Error. Body cells and body size required")
 	sys.exit(1)
 
