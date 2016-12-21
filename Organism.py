@@ -2,16 +2,19 @@ import math
 import random
 
 class Organism:
-	def __init__(self, chromosome):
-		self.chromosome = chromosome
-		self.bodySize = chromosome.bodySize
+	def __init__(self, bodySize):
+		self.bodySize = bodySize
 		self.body = [[0 for x in range(self.bodySize)] for y in range(self.bodySize)]
+		self.colorsNo = -1
 
+	def UpdateBody(self, chromosome):
+		self.body = [[0 for x in range(self.bodySize)] for y in range(self.bodySize)]
 		for i in chromosome.genotype:
 			col = i[1]
 			row = i[0]
 			self.body[col][row] = 1
-		self.colorsNo = 1
+
+		self.ColorConnectedComponents()
 
 	def ShowBody(self):
 		for x in range(self.bodySize):
@@ -25,7 +28,6 @@ class Organism:
 
 		for i in range(self.bodySize):
 			for k in range(self.bodySize):
-
 				result += self.body[i][k] * self.Distanse(k, i)
 
 		return result
