@@ -1,12 +1,11 @@
 import random
-import math
-import sys
 
 class Chromosome:
 	def __init__(self, cellNo, bodySize):
 		self.cellNo = cellNo
 		self.bodySize = bodySize
 		self.genotype = []
+		self.RandCells()
 
 	def RandCells(self):
 		seen = set()
@@ -16,6 +15,6 @@ class Chromosome:
 			col = random.randint(0, self.bodySize - 1)
 			gen = (row, col)
 			if gen not in seen:
-				self.genotype.append((gen))
+				self.genotype.extend([row, col])
 				seen.add(gen)
 				i += 1
