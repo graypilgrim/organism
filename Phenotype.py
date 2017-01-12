@@ -6,14 +6,15 @@ class Phenotype:
 		self.body = [[0 for x in range(self.size)] for y in range(self.size)]
 		self.colorsNo = -1
 
-	def UpdateBody(self, chromosome):
+	def UpdateBody(self, genotype):
 		self.body = [[0 for x in range(self.size)] for y in range(self.size)]
-		for i in range(0, len(chromosome.genotype), 2):
-			col = chromosome.genotype[i]
-			row = chromosome.genotype[i + 1]
+		for i in range(0, len(genotype), 2):
+			col = genotype[i]
+			row = genotype[i + 1]
 			self.body[col][row] = 1
 
 		self.ColorConnectedComponents()
+		print(self.GetAdaptation())
 
 	def ShowBody(self):
 		for x in range(self.size):
