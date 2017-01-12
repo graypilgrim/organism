@@ -57,3 +57,4 @@ class View(QtGui.QWidget):
 
 	def UpdateData(self, chromosome):
 		self.phenotype.UpdateBody(chromosome)
+		self.update()

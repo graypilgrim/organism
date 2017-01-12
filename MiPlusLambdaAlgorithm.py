@@ -1,6 +1,7 @@
 import threading
 import random
 from math import exp
+import time
 
 from Chromosome import Chromosome
 from Phenotype import Phenotype
@@ -22,18 +23,27 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 		self.SearchForSolution()
 
 	def StrangeFunctionName(self):
-		chromo = Chromosome(self.chromosome.cellNo, self.chromosome.bodySize)
-		chromo.RandCells()
-		self.phenotype.UpdateBody(chromo)
+		while True:
+			chromo = Chromosome(self.cellNo, self.bodySize)
+			print("UpdateData")
+			self.view.UpdateData(chromo)
+			time.sleep(0.1)
+
 
 	def SearchForSolution(self):
 		self.CreateFirstPopulation()
+		print("First")
+		self.ShowPopulation()
 
-		while not self.StopCondition():
-			tempPopulation = self.DrawTemporaryPopulation()
-			offspring = self.ReproduceOffspringPopulation(tempPopulation)
-			self.ChooseNextPopulation(offspring)
-			self.ChooseBestIndividal()
+		tempPopulation = self.DrawTemporaryPopulation()
+		print("temp")
+		self.ShowPopulation(tempPopulation)
+
+		# while not self.StopCondition():
+		# 	tempPopulation = self.DrawTemporaryPopulation()
+		# 	offspring = self.ReproduceOffspringPopulation(tempPopulation)
+		# 	self.ChooseNextPopulation(offspring)
+		# 	self.ChooseBestIndividal()
 
 	# def ChooseBestIndividal(self):
 	# 	self.view.UpdateData()
@@ -95,3 +105,11 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 					result.append(offspring[i])
 
 		self.population = result
+
+	def ShowPopulation(self, population=None):
+		if population == None:
+			for i in self.population:
+				print(i.genotype)
+		else:
+			for i in population:
+				print(i.genotype)
