@@ -1,41 +1,41 @@
 import math
-import random
 
-class Organism:
-	def __init__(self, bodySize):
-		self.bodySize = bodySize
-		self.body = [[0 for x in range(self.bodySize)] for y in range(self.bodySize)]
+class Phenotype:
+	def __init__(self, size):
+		self.size = size
+		self.body = [[0 for x in range(self.size)] for y in range(self.size)]
 		self.colorsNo = -1
 
-	def UpdateBody(self, chromosome):
-		self.body = [[0 for x in range(self.bodySize)] for y in range(self.bodySize)]
-		for i in chromosome.genotype:
-			col = i[1]
-			row = i[0]
+	def UpdateBody(self, genotype):
+		self.body = [[0 for x in range(self.size)] for y in range(self.size)]
+		for i in range(0, len(genotype), 2):
+			col = genotype[i]
+			row = genotype[i + 1]
 			self.body[col][row] = 1
 
 		self.ColorConnectedComponents()
+		print(self.GetAdaptation())
 
 	def ShowBody(self):
-		for x in range(self.bodySize):
+		for x in range(self.size):
 			print(self.body[x])
 
-	def Adaptation(self):
+	def GetAdaptation(self):
 		return self.MomentOfInertia() / self.GetConnectedComponentsNo()
 
 	def MomentOfInertia(self):
 		result = 0
 
-		for i in range(self.bodySize):
-			for k in range(self.bodySize):
+		for i in range(self.size):
+			for k in range(self.size):
 				result += self.body[i][k] * self.Distanse(k, i)
 
 		return result
 
 	def ColorConnectedComponents(self):
 		color = 1
-		for row in range(self.bodySize):
-			for col in range(self.bodySize):
+		for row in range(self.size):
+			for col in range(self.size):
 
 				if self.body[col][row] == 0:
 					continue
@@ -50,7 +50,7 @@ class Organism:
 		return self.colorsNo
 
 	def Distanse(self, row, col):
-		bodyCenter = self.bodySize / 2
+		bodyCenter = self.size / 2
 		return math.floor(math.hypot((row + 0.5) - bodyCenter, (col + 0.5) - bodyCenter))
 
 	def ColorNeighborhood(self, row, col, color):
@@ -67,9 +67,9 @@ class Organism:
 
 	def FindNeighbors(self, col, row):
 		leftBoundary = (col == 0)
-		rightBoundary = (col == self.bodySize - 1)
+		rightBoundary = (col == self.size - 1)
 		topBoundary = (row == 0)
-		bottomBoundary = (row == self.bodySize - 1)
+		bottomBoundary = (row == self.size - 1)
 
 		neighbors = []
 

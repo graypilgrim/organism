@@ -1,15 +1,16 @@
-import sys
-from PyQt4 import QtGui, QtCore
+from PyQt4 import QtGui
 import random
+
+from Phenotype import Phenotype
 
 WIDTH = 800
 HEIGHT = 600
 
 class View(QtGui.QWidget):
 
-	def __init__(self, organism):
+	def __init__(self, bodySize):
 		super(View, self).__init__()
-		self.organism = organism
+		self.phenotype = Phenotype(bodySize)
 		self.initUI()
 
 	def initUI(self):
@@ -26,23 +27,23 @@ class View(QtGui.QWidget):
 	def drawMatrix(self, qp):
 		rgbColors = self.chooseColors()
 
-		horizBoxSide = WIDTH // self.organism.bodySize
-		vertBoxSide = HEIGHT // self.organism.bodySize
+		horizBoxSide = WIDTH // self.phenotype.size
+		vertBoxSide = HEIGHT // self.phenotype.size
 
 		boxSide = min(horizBoxSide, vertBoxSide)
 
 		color = QtGui.QColor(0, 0, 0)
 		qp.setPen(color)
 
-		for col in range(self.organism.bodySize):
-			for row in range(self.organism.bodySize):
-				color = rgbColors[self.organism.body[col][row]]
+		for col in range(self.phenotype.size):
+			for row in range(self.phenotype.size):
+				color = rgbColors[self.phenotype.body[col][row]]
 				qp.setBrush(QtGui.QColor(color[0], color[1], color[2]))
 				qp.drawRect(row*boxSide, col*boxSide, boxSide, boxSide)
 
 	def chooseColors(self):
 		rgbColors = []
-		colorsNo = self.organism.GetConnectedComponentsNo()
+		colorsNo = self.phenotype.GetConnectedComponentsNo()
 
 		rgbColors.append((255, 255, 255))
 
@@ -54,8 +55,6 @@ class View(QtGui.QWidget):
 
 		return rgbColors
 
-if __name__ == '__main__':
-	app = QtGui.QApplication(sys.argv)
-	o = Organism(1, 1)
-	ex = View()
-	sys.exit(app.exec_())
+	def UpdateData(self, genotype):
+		self.phenotype.UpdateBody(genotype)
+		self.update()
