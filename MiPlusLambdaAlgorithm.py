@@ -63,22 +63,11 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 	def SearchForSolution(self):
 		self.CreateFirstPopulation()
-		print("First")
-		self.ShowPopulation()
 
 		while not self.StopCondition():
 			tempPopulation = self.DrawTemporaryPopulation()
-			print("temp")
-			self.ShowPopulation(tempPopulation)
-
 			self.ReproduceOffspringPopulation(tempPopulation)
-			print("offspring")
-			self.ShowPopulation(self.offspring)
-
 			self.ChooseNextPopulation()
-			print("nextPopulation")
-			self.ShowPopulation()
-
 			self.ChooseBestIndividal()
 			time.sleep(0.1)
 
@@ -103,7 +92,6 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 			tempPopulation[i].Interbreed(tempPopulation[i+1])
 
 			if self.ShouldMutate():
-				print("shouldMutate")
 				tempPopulation[i].Mutate()
 				self.mutationCounter = self.mutationFactor
 
@@ -114,13 +102,8 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 		self.mutationCounter -= 1
 		return self.mutationCounter == 0
 
-	def ChooseNextPopulation(self):
+	def CreateRouletteWheel(self, individualsToChoose):
 		sum = 0.0
-
-		individualsToChoose = self.SumPopulations()
-
-		print("sum:")
-		self.ShowPopulation(individualsToChoose)
 
 		adaptationValue = []
 
@@ -129,34 +112,35 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 			phenotype.UseGenotype(individualsToChoose[i])
 			adaptation = phenotype.GetAdaptation()
 
-			print(str(i) + ": " + str(adaptation))
-
 			adaptationValue.append(math.exp(adaptation))
 			sum += math.exp(adaptation)
 
-		probability = []
+		rouletteWheel = []
 		for i in range(len(individualsToChoose)):
-			probability.append(adaptationValue[i] / sum)
+			rouletteWheel.append(adaptationValue[i] / sum)
 
 		for i in range(1, len(individualsToChoose)):
-			probability[i] += probability[i - 1]
+			rouletteWheel[i] += rouletteWheel[i - 1]
 
-		print("probability:")
-		print(probability)
+		return rouletteWheel
 
-		print("creating next population")
+	def ChooseNextPopulation(self):
+		individualsToChoose = self.SumPopulations()
+
+		rouletteWheel = self.CreateRouletteWheel(individualsToChoose)
+
 		result = []
 		seen = set()
 		added = 0
 		while added < self.miValue:
 			val = random.random()
 			prev = 0.0
-			for i in range(len(probability)):
-				if prev <= val <= probability[i] and i not in seen:
+			for i in range(len(rouletteWheel)):
+				if prev <= val <= rouletteWheel[i] and i not in seen:
 					result.append(individualsToChoose[i])
 					seen.add(i)
 					added += 1
-				prev = probability[i]
+				prev = rouletteWheel[i]
 
 		self.population = result
 
@@ -173,6 +157,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 		self.lastAdaptationValue = self.currentAdaptationValue
 		self.currentAdaptationValue = adaptationBest
+		print("Current best: " + str(adaptationBest))
 
 		self.view.UpdateData(self.population[indexBest])
 

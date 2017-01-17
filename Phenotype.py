@@ -14,7 +14,6 @@ class Phenotype:
 			self.body[col][row] = 1
 
 		self.ColorConnectedComponents()
-		print(self.GetAdaptation())
 
 	def ShowBody(self):
 		for x in range(self.size):

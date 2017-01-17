@@ -1,5 +1,4 @@
 import random
-import math
 
 class Genotype:
 	def __init__(self, chromoSize, bodySize):
@@ -43,16 +42,7 @@ class Genotype:
 			chromosomeIncorrect = False
 
 	def Mutate(self, pos=None):
-		print("Mutation called")
 		if pos == None:
 			pos = random.randint(0, self.chromoSize - 1)
 
-		bitNo = math.ceil(math.log(self.bodySize, 2))
-		mutationBit = random.randint(0, bitNo - 1)
-
-		mutationMask = 1 << mutationBit
-
-		if self.positions[pos] & mutationMask == 1:
-			self.positions[pos] &= not mutationMask
-		else:
-			self.positions[pos] &= mutationMask
+		self.positions[pos] = random.randint(0, self.bodySize - 1)
