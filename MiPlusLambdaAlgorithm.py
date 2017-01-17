@@ -2,22 +2,23 @@ import threading
 import random
 import math
 import time
+import copy
 
-from Chromosome import Chromosome
+from Genotype import Genotype
 from Phenotype import Phenotype
 
 class MiPlusLambdaAlgorithm (threading.Thread):
-	miValue = 15
+	miValue = 10
 	lambdaValue = 20
 	population = []
 	offspring = []
-	mutationFactor = mutationCounter = 7
+	mutationFactor = mutationCounter = 2
 
 	currentAdaptationValue = 0.0
 	lastAdaptationValue = 0.0
 	adaptationDelta = 0.00004
 	lastAdaptationValuesBelowDelta = 0
-	maxValuesBelowDelta = 10
+	maxValuesBelowDelta = 300
 
 
 	def __init__(self, view, cellNo, bodySize):
@@ -37,6 +38,27 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 
 		self.view.UpdateData(tempGeno)
+
+	def SearchForSolutionOneIteration(self):
+		self.CreateFirstPopulation()
+		print("First")
+		self.ShowPopulation()
+
+		tempPopulation = self.DrawTemporaryPopulation()
+		print("temp")
+		self.ShowPopulation(tempPopulation)
+
+		self.ReproduceOffspringPopulation(tempPopulation)
+		print("offspring")
+		self.ShowPopulation(self.offspring)
+
+		self.ChooseNextPopulation()
+		print("nextPopulation")
+		self.ShowPopulation()
+
+		self.ChooseBestIndividal()
+
+		print("Solution found: " + str(self.currentAdaptationValue))
 
 
 	def SearchForSolution(self):
@@ -64,70 +86,33 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 	def CreateFirstPopulation(self):
 		for i in range(self.miValue):
-			chromosome = Chromosome(self.chromoSize // 2, self.bodySize)
-			self.population.append(chromosome.genotype)
+			genotype = Genotype(self.chromoSize, self.bodySize)
+			self.population.append(genotype)
 
 	def DrawTemporaryPopulation(self):
 		tempPopulation = []
 		for i in range(self.lambdaValue):
 			index = random.randint(0, self.miValue - 1)
-			tempPopulation.append(list(self.population[index]))
+			tempPopulation.append(copy.deepcopy(self.population[index]))
 
 		return tempPopulation
 
 	def ReproduceOffspringPopulation(self, tempPopulation):
 		self.offspring = []
 		for i in range(0, self.lambdaValue, 2):
-			self.Interbreed(tempPopulation[i], tempPopulation[i+1])
+			tempPopulation[i].Interbreed(tempPopulation[i+1])
 
 			if self.ShouldMutate():
-				self.Mutate(tempPopulation[i])
+				print("shouldMutate")
+				tempPopulation[i].Mutate()
+				self.mutationCounter = self.mutationFactor
 
 			self.offspring.append(tempPopulation[i])
 			self.offspring.append(tempPopulation[i+1])
 
-	def Interbreed(self, first, second):
-		locus = random.randint(0, self.chromoSize - 1)
-
-		for i in range(locus, self.chromoSize):
-			first[i], second[i] = second[i], first[i]
-
-		while not self.CheckInterbreedMutateMaybe(first):
-			pass
-
-		while not self.CheckInterbreedMutateMaybe(second):
-			pass
-
-	def CheckInterbreedMutateMaybe(self, genotype):
-		seen = set()
-		for i in range(0, self.chromoSize, 2):
-			cell = (genotype[i], genotype[i+1])
-			if cell in seen:
-				self.Mutate(genotype, i)
-				return False
-
-		return True
-
 	def ShouldMutate(self):
 		self.mutationCounter -= 1
 		return self.mutationCounter == 0
-
-	def Mutate(self, genotype, pos=None):
-		print("Mutation called")
-		if pos == None:
-			pos = random.randint(0, self.chromoSize - 1)
-
-		bitNo = math.ceil(math.log(self.bodySize, 2))
-		mutationBit = random.randint(0, bitNo - 1)
-
-		mutationMask = 1 << mutationBit
-
-		if genotype[pos] & mutationMask == 1:
-			genotype[pos] &= not mutationMask
-		else:
-			genotype[pos] &= mutationMask
-
-		self.mutationCounter = self.mutationFactor
 
 	def ChooseNextPopulation(self):
 		sum = 0.0
@@ -141,7 +126,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 		for i in range(len(individualsToChoose)):
 			phenotype = Phenotype(self.bodySize)
-			phenotype.UpdateBody(individualsToChoose[i])
+			phenotype.UseGenotype(individualsToChoose[i])
 			adaptation = phenotype.GetAdaptation()
 
 			print(str(i) + ": " + str(adaptation))
@@ -159,7 +144,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 		print("probability:")
 		print(probability)
 
-		print("crating")
+		print("creating next population")
 		result = []
 		seen = set()
 		added = 0
@@ -181,7 +166,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 		adaptationBest = 0.0
 
 		for i in range(self.miValue):
-			phenotype.UpdateBody(self.population[i])
+			phenotype.UseGenotype(self.population[i])
 			if phenotype.GetAdaptation() > adaptationBest:
 				indexBest = i
 				adaptationBest = phenotype.GetAdaptation()
@@ -209,7 +194,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 		for i in range(self.lambdaValue):
 			absent = True
 			for j in range(self.miValue):
-				if self.offspring[i] == self.population[j]:
+				if self.offspring[i].positions == self.population[j].positions:
 					absent = False
 					break
 
@@ -221,7 +206,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 	def ShowPopulation(self, population=None):
 		if population == None:
 			for i in self.population:
-				print(i)
+				print(i.positions)
 		else:
 			for i in population:
-				print(i)
+				print(i.positions)
