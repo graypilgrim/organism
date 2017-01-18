@@ -7,25 +7,26 @@ import copy
 from Genotype import Genotype
 from Phenotype import Phenotype
 
-class MiPlusLambdaAlgorithm (threading.Thread):
-	miValue = 10
-	lambdaValue = 20
+class Algorithm (threading.Thread):
+	miValue = 20
+	lambdaValue = 30
 	population = []
 	offspring = []
 	mutationFactor = mutationCounter = 2
 
 	currentAdaptationValue = 0.0
 	lastAdaptationValue = 0.0
-	adaptationDelta = 0.00004
+	adaptationDelta = 0.5
 	lastAdaptationValuesBelowDelta = 0
-	maxValuesBelowDelta = 300
+	maxValuesBelowDelta = 200
 
 
-	def __init__(self, view, cellNo, bodySize):
+	def __init__(self, view, bodySize, cellNo, miPlusLambda):
 		threading.Thread.__init__(self)
 		self.view = view
 		self.chromoSize = cellNo * 2
 		self.bodySize = bodySize
+		self.miPlusLambda = miPlusLambda
 
 	def run(self):
 		self.SearchForSolution()
@@ -63,13 +64,14 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 	def SearchForSolution(self):
 		self.CreateFirstPopulation()
+		time.sleep(0.5)
 
 		while not self.StopCondition():
 			tempPopulation = self.DrawTemporaryPopulation()
 			self.ReproduceOffspringPopulation(tempPopulation)
 			self.ChooseNextPopulation()
 			self.ChooseBestIndividal()
-			time.sleep(0.1)
+			time.sleep(0.2)
 
 		print("Solution found: " + str(self.currentAdaptationValue))
 
@@ -125,7 +127,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 		return rouletteWheel
 
 	def ChooseNextPopulation(self):
-		individualsToChoose = self.SumPopulations()
+		individualsToChoose = self.SumPopulations() if self.miPlusLambda else self.offspring
 
 		rouletteWheel = self.CreateRouletteWheel(individualsToChoose)
 
@@ -157,7 +159,7 @@ class MiPlusLambdaAlgorithm (threading.Thread):
 
 		self.lastAdaptationValue = self.currentAdaptationValue
 		self.currentAdaptationValue = adaptationBest
-		print("Current best: " + str(adaptationBest))
+		print("#" + str(self.lastAdaptationValuesBelowDelta) + "\tCurrent best: " + str(adaptationBest))
 
 		self.view.UpdateData(self.population[indexBest])
 
