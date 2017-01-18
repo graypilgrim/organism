@@ -56,5 +56,5 @@ class View(QtGui.QWidget):
 		return rgbColors
 
 	def UpdateData(self, genotype):
-		self.phenotype.UpdateBody(genotype)
+		self.phenotype.UseGenotype(genotype)
 		self.update()
