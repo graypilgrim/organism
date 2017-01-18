@@ -8,7 +8,7 @@ from Genotype import Genotype
 from Phenotype import Phenotype
 
 class Algorithm (threading.Thread):
-	miValue = 20
+	muValue = 20
 	lambdaValue = 30
 	population = []
 	offspring = []
@@ -16,17 +16,17 @@ class Algorithm (threading.Thread):
 
 	currentAdaptationValue = 0.0
 	lastAdaptationValue = 0.0
-	adaptationDelta = 0.5
+	adaptationDelta = 0.05
 	lastAdaptationValuesBelowDelta = 0
 	maxValuesBelowDelta = 200
 
 
-	def __init__(self, view, bodySize, cellNo, miPlusLambda):
+	def __init__(self, view, bodySize, cellNo, muPlusLambda):
 		threading.Thread.__init__(self)
 		self.view = view
 		self.chromoSize = cellNo * 2
 		self.bodySize = bodySize
-		self.miPlusLambda = miPlusLambda
+		self.muPlusLambda = muPlusLambda
 
 	def run(self):
 		self.SearchForSolution()
@@ -76,14 +76,14 @@ class Algorithm (threading.Thread):
 		print("Solution found: " + str(self.currentAdaptationValue))
 
 	def CreateFirstPopulation(self):
-		for i in range(self.miValue):
+		for i in range(self.muValue):
 			genotype = Genotype(self.chromoSize, self.bodySize)
 			self.population.append(genotype)
 
 	def DrawTemporaryPopulation(self):
 		tempPopulation = []
 		for i in range(self.lambdaValue):
-			index = random.randint(0, self.miValue - 1)
+			index = random.randint(0, self.muValue - 1)
 			tempPopulation.append(copy.deepcopy(self.population[index]))
 
 		return tempPopulation
@@ -127,14 +127,14 @@ class Algorithm (threading.Thread):
 		return rouletteWheel
 
 	def ChooseNextPopulation(self):
-		individualsToChoose = self.SumPopulations() if self.miPlusLambda else self.offspring
+		individualsToChoose = self.SumPopulations() if self.muPlusLambda else self.offspring
 
 		rouletteWheel = self.CreateRouletteWheel(individualsToChoose)
 
 		result = []
 		seen = set()
 		added = 0
-		while added < self.miValue:
+		while added < self.muValue:
 			val = random.random()
 			prev = 0.0
 			for i in range(len(rouletteWheel)):
@@ -151,7 +151,7 @@ class Algorithm (threading.Thread):
 		indexBest = -1
 		adaptationBest = 0.0
 
-		for i in range(self.miValue):
+		for i in range(self.muValue):
 			phenotype.UseGenotype(self.population[i])
 			if phenotype.GetAdaptation() > adaptationBest:
 				indexBest = i
@@ -175,12 +175,12 @@ class Algorithm (threading.Thread):
 	def SumPopulations(self):
 		result = []
 
-		for i in range(self.miValue):
+		for i in range(self.muValue):
 			result.append(self.population[i])
 
 		for i in range(self.lambdaValue):
 			absent = True
-			for j in range(self.miValue):
+			for j in range(self.muValue):
 				if self.offspring[i].positions == self.population[j].positions:
 					absent = False
 					break
