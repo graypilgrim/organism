@@ -35,6 +35,7 @@ class Genotype:
 			seen = set()
 			for i in range(0, self.chromoSize, 2):
 				cell = (self.positions[i], self.positions[i+1])
+				seen.add(cell)
 				if cell in seen:
 					self.Mutate(i)
 					break

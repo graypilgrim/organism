@@ -64,7 +64,7 @@ class Algorithm (threading.Thread):
 
 	def SearchForSolution(self):
 		self.CreateFirstPopulation()
-		time.sleep(0.5)
+		time.sleep(0.2)
 
 		while not self.StopCondition():
 			tempPopulation = self.DrawTemporaryPopulation()
